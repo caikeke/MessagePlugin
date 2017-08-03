@@ -69,7 +69,13 @@ public class MessagePlugin extends CordovaPlugin{
     if(messageInfoList.size()>0){
       packagJSONData(messageInfoList);
     }else {
-      mCallbackContext.success("");
+      JSONObject jsonData = new JSONObject();
+      try {
+        jsonData.put("totalCount","0");
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+      mCallbackContext.success(jsonData);
     }
   }
   private void packagJSONData(List<MessageInfo> messageInfoList ){
@@ -77,15 +83,22 @@ public class MessagePlugin extends CordovaPlugin{
     for (MessageInfo item :messageInfoList){
       JSONObject jsonObject = new JSONObject();
       try {
-        jsonObject.put("body",item.getBody());
-        jsonObject.put("date",item.getDate());
+        jsonObject.put("content",item.getBody());
+        jsonObject.put("contactTime",item.getDate());
         jsonObject.put("phone",item.getAddress());
         mJSonArray.put(jsonObject);
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
-    mCallbackContext.success(mJSonArray);
+    JSONObject jsonData = new JSONObject();
+    try {
+      jsonData.put("contacts",mJSonArray);
+      jsonData.put("totalCount",messageInfoList.size());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    mCallbackContext.success(jsonData);
   }
   private class MessageInfo{
     String body;//内容
